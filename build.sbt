@@ -2,18 +2,21 @@ lazy val commonSettings = Seq(
   organization := "org.scalawebtest",
   version := "0.0.1-SNAPSHOT",
   scalaVersion := "2.11.8",
-  scalacOptions := Seq("-unchecked", "-deprecation")
+  scalacOptions := Seq("-unchecked", "-deprecation"),
+  publishMavenStyle := true
 )
 
-lazy val core = project
-  .settings(commonSettings: _*)
-  .settings(
-    libraryDependencies ++= Seq(
+val coreDependencies = Seq(
       "org.scalatest" % "scalatest_2.11" % "3.0.0",
       "org.seleniumhq.selenium" % "selenium-java" % "2.53.1",
       "org.seleniumhq.selenium" % "selenium-htmlunit-driver" % "2.52.0",
       "org.slf4j" % "slf4j-api" % "1.7.20"
     )
+
+lazy val core = project
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= coreDependencies
   )
 
 lazy val aem = project
@@ -37,5 +40,21 @@ lazy val integration_test = project
   .enablePlugins(JettyPlugin)
   .dependsOn(core)
   .dependsOn(aem)
+
+lazy val bom = project
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= coreDependencies
+  )
+  .settings(
+    pomExtra :=
+      <licenses>
+        <license>
+          <name>Apache 2</name>
+          <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+  )
 
 addCommandAlias("inttest", "; jetty:start ; it:test ; jetty:stop")
